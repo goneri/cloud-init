@@ -1679,7 +1679,7 @@ def mounts():
     return mounted
 
 
-def mount_cb(device, callback, data=None, rw=False, mtype=None, sync=True,
+def mount_cb(device, callback, data=None, rw=False, mtype=None, sync=None,
              update_env_for_mount=None):
     """
     Mount the device, call method 'callback' passing the directory
@@ -1704,6 +1704,8 @@ def mount_cb(device, callback, data=None, rw=False, mtype=None, sync=True,
     # clean up 'mtype' input a bit based on platform.
     platsys = platform.system().lower()
     if platsys == "linux":
+        if sync is None:
+            sync = True
         if mtypes is None:
             mtypes = ["auto"]
     elif platsys.endswith("bsd"):
