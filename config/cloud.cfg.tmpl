@@ -33,7 +33,7 @@ preserve_hostname: false
 {% if variant in ["freebsd"] %}
 # This should not be required, but leave it in place until the real cause of
 # not beeing able to find -any- datasources is resolved.
-datasource_list: ['ConfigDrive', 'Azure', 'OpenStack', 'Ec2']
+datasource_list: ['ConfigDrive', 'Azure', 'OpenStack', 'Ec2', 'NoCloud']
 {% endif %}
 # Example datasource config
 # datasource:
