@@ -9,6 +9,7 @@ fail() { echo "FAILED:" "$@" 1>&2; exit 1; }
 depschecked=/tmp/c-i.dependencieschecked
 pkgs="
    bash
+   chpasswd
    dmidecode
    e2fsprogs
    py27-Jinja2
