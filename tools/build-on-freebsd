@@ -33,8 +33,8 @@ touch $depschecked
 # Luckily, the install step will take care of this by installing it from pypi...
 
 # Build the code and install in /usr/local/:
-python setup.py build
-python setup.py install -O1 --skip-build --prefix /usr/local/ --init-system sysvinit_freebsd
+python2.7 setup.py build
+python2.7 setup.py install -O1 --skip-build --prefix /usr/local/ --init-system sysvinit_freebsd
 
 # Enable cloud-init in /etc/rc.conf:
 sed -i.bak -e "/cloudinit_enable=.*/d" /etc/rc.conf
