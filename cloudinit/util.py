@@ -2349,7 +2349,10 @@ def parse_mtab(path):
 
 
 def find_freebsd_part(fs):
-    if fs.startswith("/dev/label/") or fs.startswith("/dev/gpt/"):
+    splitted = fs.split('/')
+    if len(splitted) == 3:
+        return splitted[2]
+    elif splitted[2] in ['label', 'gpt', 'ufs']:
         target_label = fs[5:]
         (part, _err) = subp(['glabel', 'status', '-s'])
         for labels in part.split("\n"):
@@ -2359,7 +2362,7 @@ def find_freebsd_part(fs):
                 break
         return str(part)
     else:
-        return fs[5:]
+        LOG.warning("Unexpected input in find_freebsd_part: %s", fs)
 
 
 def get_path_dev_freebsd(path, mnt_list):
