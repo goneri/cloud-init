@@ -81,7 +81,7 @@ def _resize_xfs(mount_point, devpth):
 
 
 def _resize_ufs(mount_point, devpth):
-    return ('growfs', '-y', devpth)
+    return ('growfs', '-y', mount_point)
 
 
 def _resize_zfs(mount_point, devpth):
