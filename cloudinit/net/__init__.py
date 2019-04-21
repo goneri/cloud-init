@@ -767,6 +767,8 @@ def get_ib_interface_hwaddr(ifname, ethernet_format):
 def get_interfaces_by_mac():
     if util.is_FreeBSD():
         return get_interfaces_by_mac_on_freebsd()
+    elif util.is_NetBSD():
+        return get_interfaces_by_mac_on_netbsd()
     else:
         return get_interfaces_by_mac_on_linux()
 
@@ -797,6 +799,19 @@ def get_interfaces_by_mac_on_freebsd():
     results = {mac: ifname for mac, ifname in find_mac(flatten(out))}
     return results
 
+def get_interfaces_by_mac_on_netbsd():
+    ret = {}
+    re_field_match = (
+            r"(?P<ifname>\w+).*address:\s"
+            "(?P<mac>([\da-f]{2}[:-]){5}([\da-f]{2})).*")
+    (out, _) = util.subp(['ifconfig', '-a'])
+    if_lines = re.sub(r'\n\s+', ' ', out).splitlines()
+    for line in if_lines:
+        m = re.match(re_field_match, line)
+        if m:
+            fields = m.groupdict()
+            ret[fields['mac']] = fields['ifname']
+    return ret
 
 def get_interfaces_by_mac_on_linux():
     """Build a dictionary of tuples {mac: name}.

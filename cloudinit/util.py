@@ -554,6 +554,10 @@ def is_FreeBSD():
     return system_info()['variant'] == "freebsd"
 
 
+def is_NetBSD():
+    return system_info()['variant'] == "netbsd"
+
+
 def get_cfg_option_bool(yobj, key, default=False):
     if key not in yobj:
         return default
@@ -677,7 +681,7 @@ def system_info():
             var = 'suse'
         else:
             var = 'linux'
-    elif system in ('windows', 'darwin', "freebsd"):
+    elif system in ('windows', 'darwin', "freebsd", "netbsd"):
         var = system
 
     info['variant'] = var
@@ -2411,6 +2415,7 @@ def get_mount_info_freebsd(path):
     ret = result.split()
     label_part = find_freebsd_part(ret[0])
     return "/dev/" + label_part, ret[2], ret[1]
+
 
 
 def get_device_info_from_zpool(zpool):
