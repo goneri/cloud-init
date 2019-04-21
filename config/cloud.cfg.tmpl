@@ -2,7 +2,7 @@
 # The top level settings are used as module
 # and system configuration.
 
-{% if variant in ["freebsd"] %}
+{% if variant in ["freebsd", "netbsd"] %}
 syslog_fix_perms: root:wheel
 {% elif variant in ["suse"] %}
 syslog_fix_perms: root:root
@@ -48,15 +48,17 @@ cloud_init_modules:
  - seed_random
  - bootcmd
  - write-files
+{% if variant not in ["netbsd"] %}
  - growpart
  - resizefs
-{% if variant not in ["freebsd"] %}
+{% endif %}
+{% if variant not in ["freebsd", "netbsd"] %}
  - disk_setup
  - mounts
 {% endif %}
  - set_hostname
  - update_hostname
-{% if variant not in ["freebsd"] %}
+{% if variant not in ["freebsd", "netbsd"] %}
  - update_etc_hosts
  - ca-certs
  - rsyslog
@@ -91,7 +93,7 @@ cloud_config_modules:
 {% if variant in ["suse"] %}
  - zypper-add-repo
 {% endif %}
-{% if variant not in ["freebsd"] %}
+{% if variant not in ["freebsd", "netbsd"] %}
  - ntp
 {% endif %}
  - timezone
@@ -115,7 +117,7 @@ cloud_final_modules:
 {% if variant in ["ubuntu", "unknown"] %}
  - ubuntu-drivers
 {% endif %}
-{% if variant not in ["freebsd"] %}
+{% if variant not in ["freebsd", "netbsd"] %}
  - puppet
  - chef
  - mcollective
@@ -137,7 +139,7 @@ cloud_final_modules:
 # (not accessible to handlers/transforms)
 system_info:
    # This will affect which distro class gets used
-{% if variant in ["arch", "centos", "debian", "fedora", "freebsd", "rhel", "suse", "ubuntu"] %}
+{% if variant in ["arch", "centos", "debian", "fedora", "freebsd", "rhel", "suse", "ubuntu", "netbsd"] %}
    distro: {{ variant }}
 {% else %}
    # Unknown/fallback distro.
@@ -214,4 +216,19 @@ system_info:
      groups: [wheel]
      sudo: ["ALL=(ALL) NOPASSWD:ALL"]
      shell: /bin/tcsh
+{% elif variant in ["netbsd"] %}
+   default_user:
+     name: netbsd
+     lock_passwd: True
+     gecos: NetBSD
+     groups: [wheel]
+     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+     shell: /bin/sh
+{% endif %}
+{% if variant in ["freebsd"] %}
+   network:
+      renderers: ['freebsd']
+{% elif variant in ["netbsd"] %}
+   network:
+      renderers: ['netbsd']
 {% endif %}
