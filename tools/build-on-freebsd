@@ -5,6 +5,9 @@
 
 fail() { echo "FAILED:" "$@" 1>&2; exit 1; }
 
+pkg install python3
+py_prefix=$(python3 -c 'import sys; print("py%d%d" % (sys.version_info.major, sys.version_info.minor))')
+
 # Check dependencies:
 depschecked=/tmp/c-i.dependencieschecked
 pkgs="
@@ -12,27 +15,26 @@ pkgs="
    chpasswd
    dmidecode
    e2fsprogs
-   py27-Jinja2
-   py27-boto
-   py27-cheetah
-   py27-configobj
-   py27-jsonpatch
-   py27-jsonpointer
-   py27-jsonschema
-   py27-oauthlib
-   py27-requests
-   py27-serial
-   py27-six
-   py27-yaml
-   python
+   $py_prefix-Jinja2
+   $py_prefix-boto
+   $py_prefix-configobj
+   $py_prefix-jsonpatch
+   $py_prefix-jsonpointer
+   $py_prefix-jsonschema
+   $py_prefix-oauthlib
+   $py_prefix-requests
+   $py_prefix-serial
+   $py_prefix-six
+   $py_prefix-yaml
    sudo
 "
 [ -f "$depschecked" ] || pkg install ${pkgs} || fail "install packages"
 touch $depschecked
 
+pkg install $py_prefix-cheetah || true
 # Build the code and install in /usr/local/:
-python2.7 setup.py build
-python2.7 setup.py install -O1 --skip-build --prefix /usr/local/ --init-system sysvinit_freebsd
+python3 setup.py build
+python3 setup.py install -O1 --skip-build --prefix /usr/local/ --init-system sysvinit_freebsd
 
 # Enable cloud-init in /etc/rc.conf:
 sed -i.bak -e "/cloudinit_enable=.*/d" /etc/rc.conf
