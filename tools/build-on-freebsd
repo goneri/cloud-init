@@ -3,6 +3,8 @@
 # installing cloud-init. This script takes care of building and installing. It
 # will optionally make a first run at the end.
 
+set -eux
+
 fail() { echo "FAILED:" "$@" 1>&2; exit 1; }
 
 pkg install python3
@@ -11,24 +13,23 @@ py_prefix=$(python3 -c 'import sys; print("py%d%d" % (sys.version_info.major, sy
 # Check dependencies:
 depschecked=/tmp/c-i.dependencieschecked
 pkgs="
-   bash
-   chpasswd
-   dmidecode
-   e2fsprogs
-   $py_prefix-Jinja2
-   $py_prefix-boto
-   $py_prefix-configobj
-   $py_prefix-jsonpatch
-   $py_prefix-jsonpointer
-   $py_prefix-jsonschema
-   $py_prefix-oauthlib
-   $py_prefix-requests
-   $py_prefix-serial
-   $py_prefix-six
-   $py_prefix-yaml
-   sudo
+    bash
+    dmidecode
+    e2fsprogs
+    $py_prefix-Jinja2
+    $py_prefix-boto
+    $py_prefix-configobj
+    $py_prefix-jsonpatch
+    $py_prefix-jsonpointer
+    $py_prefix-jsonschema
+    $py_prefix-oauthlib
+    $py_prefix-requests
+    $py_prefix-serial
+    $py_prefix-six
+    $py_prefix-yaml
+    sudo
 "
-[ -f "$depschecked" ] || pkg install ${pkgs} || fail "install packages"
+[ -f "$depschecked" ] || pkg install --yes ${pkgs} || fail "install packages"
 touch $depschecked
 
 pkg install $py_prefix-cheetah || true
@@ -42,21 +43,21 @@ echo 'cloudinit_enable="YES"' >> /etc/rc.conf
 
 echo "Installation completed."
 
-if [ "$1" = "run" ]; then
-	echo "Ok, now let's see if it works."
+if [ "$#" -gt 1 ] && [ "$1" = "run" ]; then
+    echo "Ok, now let's see if it works."
 
-	# Backup SSH keys
-	mv /etc/ssh/ssh_host_* /tmp/
+    # Backup SSH keys
+    mv /etc/ssh/ssh_host_* /tmp/
 
-	# Remove old metadata
-	rm -rf /var/lib/cloud
+    # Remove old metadata
+    rm -rf /var/lib/cloud
 
-	# Just log everything, quick&dirty
-	rm /usr/local/etc/cloud/cloud.cfg.d/05_logging.cfg 
+    # Just log everything, quick&dirty
+    rm /usr/local/etc/cloud/cloud.cfg.d/05_logging.cfg
 
-	# Start:
-	/usr/local/etc/rc.d/cloudinit start
+    # Start:
+    /usr/local/etc/rc.d/cloudinit start
 
-	# Restore SSH keys
-	mv /tmp/ssh_host_* /etc/ssh/
+    # Restore SSH keys
+    mv /tmp/ssh_host_* /etc/ssh/
 fi
