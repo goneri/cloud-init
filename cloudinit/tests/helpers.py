@@ -509,6 +509,10 @@ def skipUnlessJsonSchema():
         _missing_jsonschema_dep, "No python-jsonschema dependency present.")
 
 
+def skipUnlessFreeBSD():
+    return skipIf(not util.is_FreeBSD, "Not on FreeBSD")
+
+
 def skipUnlessJinja():
     return skipIf(not JINJA_AVAILABLE, "No jinja dependency present.")
 
