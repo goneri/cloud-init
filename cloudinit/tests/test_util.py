@@ -9,7 +9,7 @@ import platform
 
 import cloudinit.util as util
 
-from cloudinit.tests.helpers import CiTestCase, mock
+from cloudinit.tests.helpers import CiTestCase, mock, skipUnlessFreeBSD
 from textwrap import dedent
 
 LOG = logging.getLogger(__name__)
@@ -187,6 +187,18 @@ class TestUtil(CiTestCase):
         m_mount_info.return_value = ('/dev/sda1', 'btrfs', '/', 'ro,relatime')
         is_rw = util.mount_is_read_write('/')
         self.assertEqual(is_rw, False)
+
+
+class TestUptime(CiTestCase):
+
+    @skipUnlessFreeBSD()
+    def test_boottime(self):
+        # seconds since 1970-01-01 00:00:00 UT
+        time_of_writing_this_test_in_UTC = 1574799999
+        # boot time returns the same format, and if physics is right
+        # should return a value > than the time of writing this test.
+        boot_time = util.boottime()
+        self.assertTrue(boot_time > time_of_writing_this_test_in_UTC)
 
 
 class TestShellify(CiTestCase):
