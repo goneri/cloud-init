@@ -510,7 +510,7 @@ def skipUnlessJsonSchema():
 
 
 def skipUnlessFreeBSD():
-    return skipIf(not util.is_FreeBSD, "Not on FreeBSD")
+    return skipIf(not util.is_FreeBSD(), "Not on FreeBSD")
 
 
 def skipUnlessJinja():
