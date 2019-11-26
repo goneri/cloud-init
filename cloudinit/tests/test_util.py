@@ -194,11 +194,11 @@ class TestUptime(CiTestCase):
     @skipUnlessFreeBSD()
     def test_boottime(self):
         # seconds since 1970-01-01 00:00:00 UT
-        time_of_writing_this_test_in_UTC = 1574799999
+        time__writing_UTC_minus_1_year = 1574799999 - 31557600
         # boot time returns the same format, and if physics is right
-        # should return a value > than the time of writing this test.
+        # should return a value > than one year ago from now.
         boot_time = util.boottime()
-        self.assertTrue(boot_time > time_of_writing_this_test_in_UTC)
+        self.assertTrue(boot_time > time__writing_UTC_minus_1_year)
 
 
 class TestShellify(CiTestCase):
