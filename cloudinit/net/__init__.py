@@ -329,6 +329,47 @@ def is_disabled_cfg(cfg):
 
 def find_fallback_nic(blacklist_drivers=None):
     """Return the name of the 'fallback' network device."""
+    if util.is_FreeBSD():
+        return find_fallback_nic_on_freebsd()
+    else:
+        return find_fallback_nic_on_linux()
+
+
+def find_fallback_nic_on_freebsd(blacklist_drivers=None):
+    """Return the name of the 'fallback' network device on FreeBSD.
+
+    @param blacklist_drivers: currently ignored
+    @return default interface, or None
+
+
+    route -n show default returns something like::
+
+       route to: 0.0.0.0
+    destination: 0.0.0.0
+           mask: 0.0.0.0
+        gateway: 172.31.1.1
+            fib: 0
+      interface: vtnet0
+          flags: <UP,GATEWAY,DONE,STATIC>
+     recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+           0         0         0         0      1500         1         0
+
+    we're interested in ``interface: vtnet0``.
+    """
+    route, stderr = util.subp(['route', '-n', 'show', 'default'])
+
+    via_re = re.compile("^\s+interface: (?P<netif>\w+)$")
+    for l in route.split("\n"):
+        maybe_netif = via_re.match(l)
+
+        if maybe_netif is not None:
+            return maybe_netif.group("netif")
+
+    return None
+
+
+def find_fallback_nic_on_linux(blacklist_drivers=None):
+    """Return the name of the 'fallback' network device on Linux."""
     if not blacklist_drivers:
         blacklist_drivers = []
 
