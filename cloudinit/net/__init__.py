@@ -344,7 +344,7 @@ def find_fallback_nic_on_freebsd(blacklist_drivers=None):
 
     we'll use the first interface from ``ifconfig -l -u ether``
     """
-    stdout, stderr = util.subp(['ifconfig', '-l', '-u', 'ether'])
+    stdout, _stderr = util.subp(['ifconfig', '-l', '-u', 'ether'])
     if stdout:
         return stdout.split()[0]
     return None
