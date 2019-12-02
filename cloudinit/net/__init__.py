@@ -342,30 +342,15 @@ def find_fallback_nic_on_freebsd(blacklist_drivers=None):
     @return default interface, or None
 
 
-    route -n show default returns something like::
-
-       route to: 0.0.0.0
-    destination: 0.0.0.0
-           mask: 0.0.0.0
-        gateway: 172.31.1.1
-            fib: 0
-      interface: vtnet0
-          flags: <UP,GATEWAY,DONE,STATIC>
-     recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
-           0         0         0         0      1500         1         0
-
-    we're interested in ``interface: vtnet0``.
+    we'll use the first interface from ``ifconfig -l -u ether``
     """
-    route, stderr = util.subp(['route', '-n', 'show', 'default'])
+    stdout, stderr = util.subp(['ifconfig', '-l', '-u', 'ether'])
 
-    via_re = re.compile("^\s+interface: (?P<netif>\w+)$")
-    for l in route.split("\n"):
-        maybe_netif = via_re.match(l)
-
-        if maybe_netif is not None:
-            return maybe_netif.group("netif")
-
-    return None
+    ifconfig = stdout.split()
+    try:
+        return ifconfig[0]
+    except IndexError:
+        return None
 
 
 def find_fallback_nic_on_linux(blacklist_drivers=None):
