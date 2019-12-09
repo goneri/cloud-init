@@ -48,7 +48,7 @@ class Renderer(renderer.Renderer):
 
                 if subnet.get('type') == 'static':
                     LOG.debug('Configuring dev %s with %s / %s', device_name,
-                           subnet.get('address'), subnet.get('netmask'))
+                              subnet.get('address'), subnet.get('netmask'))
                 # Configure an ipv4 address.
                     ifconfig = (
                             subnet.get('address') + ' netmask ' +
