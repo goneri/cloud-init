@@ -27,6 +27,9 @@ pkgs="
 touch $depschecked
 
 # Build the code and install in /usr/pkg/:
+pkg_add ${py_prefix}-pip
+${PYTHON} -m pip install jsonpointer
+
 ${PYTHON} setup.py build
 ${PYTHON} setup.py install -O1 --distro netbsd --skip-build --init-system sysvinit_netbsd
 mv -v /usr/local/etc/rc.d/cloud* /etc/rc.d
